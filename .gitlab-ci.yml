@@ -1,0 +1,50 @@
+stages:
+  - generation
+  - scan
+  - import
+
+prepare-the-sca-maven-generation:
+  stage: generation
+  image: maven:3.8.1-openjdk-11-slim
+  script: |
+    mvn dependency:tree -DoutputFile=maven_dep_tree.txt
+  artifacts:
+    paths:
+      - "maven_dep_tree.txt"
+  allow_failure: true
+  rules:
+  - if: "$CI_MERGE_REQUEST_IID"
+  - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+
+semgrep-the-sca:
+  stage: scan
+  image: semgrep/semgrep
+  dependencies:
+   - prepare-the-sca-maven-generation
+  script: semgrep ci --supply-chain --json --output=report-ssc.json
+  artifacts:
+    paths:
+    - report-ssc.json
+    when: always
+  rules:
+  - if: "$CI_MERGE_REQUEST_IID"
+  - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+  variables:
+    SEMGREP_APP_TOKEN: "$SEMGREP_APP_TOKEN"
+    
+import-semgrep-dependency-scanning:
+  stage: import
+  image: python:3.9-bullseye
+  dependencies:
+   - semgrep-the-sca
+  script:
+   - echo "Download Python Script"
+   - pip3 install argparse
+   - curl -O https://raw.githubusercontent.com/r2c-CSE/semgrep-utilities/main/integrations/gitlab/scaGitLabScript.py
+   - python3 scaGitLabScript.py report-ssc.json
+  artifacts:
+     reports:
+       dependency_scanning: gl-dependency-scanning-report.json
+     paths:
+     - gl-dependency-scanning-report.json
+
