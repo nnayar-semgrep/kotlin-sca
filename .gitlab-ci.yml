@@ -7,7 +7,7 @@ prepare-the-sca-maven-generation:
   stage: generation
   image: maven:3.8.1-openjdk-11-slim
   script: |
-    mvn dependency:tree -DoutputFile=maven_dep_tree.txt
+    mvn dependency:tree -DskipTest -DoutputFile=maven_dep_tree.txt
   artifacts:
     paths:
       - "maven_dep_tree.txt"
