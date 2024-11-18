@@ -40,7 +40,7 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-saml-core</artifactId>
-            <version>22.0.12</version>
+            <version>221.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.santuario</groupId>
