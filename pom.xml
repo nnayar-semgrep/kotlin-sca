@@ -30,7 +30,7 @@
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-saml-core</artifactId>
+            <artifactId>kotlin-maven</artifactId>
             <version>22.0.11</version>
         </dependency>
         <dependency>
